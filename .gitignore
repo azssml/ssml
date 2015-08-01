@@ -1,0 +1,4 @@
+*.pyc
+*~
+SSML.ini
+.mhonarc.db
