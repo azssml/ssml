@@ -28,14 +28,16 @@ Setup
 
 To setup a mailing list, edit an INI file which will take the form
 
->   [listname]
->   imapserver=IMAP-SERVERADDR
->   imapuser=IMAP-USERNAME
->   imappass=IMAP-PASSWORD
->   smtpserver=SMTP-SERVERADDR
->   smtpuser=SMTP-USERNAME
->   smtppass=SMTP-PASSWORD
->   userlist=/path/to/userlist
+<pre>
+   [listname]
+   imapserver=IMAP-SERVERADDR
+   imapuser=IMAP-USERNAME
+   imappass=IMAP-PASSWORD
+   smtpserver=SMTP-SERVERADDR
+   smtpuser=SMTP-USERNAME
+   smtppass=SMTP-PASSWORD
+   userlist=/path/to/userlist
+</pre>
 
 The above minimal config will tell the *MailForwarder.Forward* object to log in
 to IMAP-SERVERADDR with the supplied credentials, scan the INBOX for unseen
