@@ -125,6 +125,7 @@ class ConfigFile(object):
         ret = self.FindOptionValue("smtpport")
         if ret is None:
             ret = "587"
+        return ret
 
     def GetSMTPUser(self):
         return self.FindOptionValue("smtpuser")

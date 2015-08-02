@@ -82,18 +82,33 @@ class Forwarder(object):
         self.SaveUserList()
 
     def ProcessEmail(self, mail):
+
+        mailaddr = parseaddr(mail['from'])[1]
+
+        if mailaddr not in self.users:
+            print "Will not forward from addr %s" % mailaddr
+            return
+
+        print "Connecting..."
         s = smtplib.SMTP(self.Config.GetSMTPServer(), self.Config.GetSMTPServerPort())
+        print "Connected..."
         s.starttls()
+        print "TLS..."
         s.login(self.Config.GetSMTPUser(), self.Config.GetSMTPPass())
+        print "Logged in..."
         subj = mail['subject'].lower()
         expectedprefix = "[%s]" % self.Config.SubjectPrefix()
         
         if expectedprefix not in subj:
-            subj = expectedprefix + subj
-            mail['subject'] = subj
+            subj = expectedprefix + " " + subj
+            del mail['subject']
+            del mail['Subject']
+            mail['Subject'] = subj
 
         for user in self.users:
+            print "Sending mail to: %s" % user
             s.sendmail(mail['from'], user, mail.as_string())
+            print "Sent"
 
 
     def FetchMail(self):
@@ -109,7 +124,6 @@ class Forwarder(object):
                 if result.lower() == "ok":
                     self.Unsubscribe(Parser().parsestr(maildata[0][1]))
                     delete_ids.append(eml)
-
 
 
         # Handle subscribe requests
@@ -128,15 +142,16 @@ class Forwarder(object):
         
         try:
             result, data = self.mail.uid('search', None, "(UNSEEN)")
-            ids = data[0].split()
+            ids = [x for x in data[0].split(' ') if x != '']
             for eml in ids:
-                result, maildata = self.mail.fetch(eml, '(RFC822)')
+                result, maildata = self.mail.uid('FETCH', eml, '(BODY[])')
                 if result.lower() == "ok":
-                    self.ProcessEmail(Parser().parsestr(maildata[0][1]))
-                    delete_ids.append(eml)
-
+                    if maildata[0] is not None:
+                        self.ProcessEmail(Parser().parsestr(maildata[0][1]))
+                        self.mail.store(eml, '+FLAGS', '(\Seen)')
+                if self.Config.GetDelete():
+                    self.mail.uid('STORE', eml, '+FLAGS', '(\Deleted)')
             if self.Config.GetDelete():
-                self.mail.uid('STORE', ','.join(delete_ids), '+FLAGS', '(\Deleted)')
                 self.mail.expunge()
         finally:
             print "Done..."
