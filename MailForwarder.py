@@ -6,7 +6,7 @@ The MailForwarder module exists to read mail messages, forward them on to the
 group, and finally resubmit them to a month/year separated mailbox in mbox 
 format"""
 
-
+import sys
 import imaplib
 import smtplib
 
@@ -155,3 +155,11 @@ class Forwarder(object):
                 self.mail.expunge()
         finally:
             print "Done..."
+
+if __name__ == "__main__":
+    iniPath=sys.argv[1]
+    mlist=sys.argv[2]
+    
+    fwd = Forwarder(mlist, iniPath)
+    fwd.FetchMail()
+
