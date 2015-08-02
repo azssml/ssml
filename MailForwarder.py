@@ -7,8 +7,10 @@ group, and finally resubmit them to a month/year separated mailbox in mbox
 format"""
 
 import sys
+import datetime
 import imaplib
 import smtplib
+import mailbox
 
 from email.parser import Parser
 from email.utils import parseaddr
@@ -89,6 +91,14 @@ class Forwarder(object):
             print "Will not forward from addr %s" % mailaddr
             return
 
+        if self.Config.GetOutdirConfig() is not None:
+            d = datetime.datetime.now()
+            mboxname = self.Config.GetOutdirConfig() + '/' + d.strftime("%Y-%m") + ".mbox"
+            mbox = mailbox.mbox(mboxname)
+            mbox.lock()
+            mbox.add(mail)
+            mbox.unlock()
+
         print "Connecting..."
         s = smtplib.SMTP(self.Config.GetSMTPServer(), self.Config.GetSMTPServerPort())
         print "Connected..."
@@ -136,10 +146,6 @@ class Forwarder(object):
                     self.Subscribe(Parser().parsestr(maildata[0][1]))
                     delete_ids.append(eml)
 
-        if self.mbox is None:
-            if self.Config.GetOutdirConfig() is not None:
-                print "WHATH!!!11!!11"
-        
         try:
             result, data = self.mail.uid('search', None, "(UNSEEN)")
             ids = [x for x in data[0].split(' ') if x != '']
