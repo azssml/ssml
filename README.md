@@ -6,6 +6,21 @@ simple mailing list - subscribe/unsubscribe, archiving, moderation. It is
 written in the Python language.
 
 
+Motivation
+----------
+
+Why write 'yet another mailing list' package? Simple; I needed something that
+could be configured quickly on any python enabled system and could fetch mail
+from an exchange server, forward it around, and do basic mailing list stuff.
+
+``Mailman`` is the premier package in this realm. It's so good that most folks
+grin and bear it with the nightmare that is postfix and sendmail configurations
+to just do simple IMAP fetch and forward. I'd love to say that I'm patient
+enough to get all the various pieces configured. I'm not. Further, the place
+where this will be used doesn't have enough people in IT support to be able to
+maintain such a system. Simpler == better, in my opinion.
+
+
 Setup
 -----
 
